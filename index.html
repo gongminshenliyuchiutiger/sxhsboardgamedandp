@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人文社會類桌遊設計與製作 - 雙溪高中</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@300;500;700&display=swap');
+
+        /* --- 變數設定 --- */
+        :root {
+            --bg-deep: #1a0b2e;
+            --accent-cyan: #00f2ff;
+            --accent-pink: #ff0055;
+            --accent-yellow: #ffcc00;
+            --accent-purple: #bd00ff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- 全局樣式 --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-deep);
+            color: #ffffff;
+            overflow-x: hidden;
+            /* 網格背景紋理 */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* --- 背景飄浮動畫物件 --- */
+        .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            filter: blur(50px);
+            opacity: 0.6;
+            animation: floatShape 20s infinite linear;
+        }
+
+        .shape:nth-child(1) { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--accent-purple); animation-duration: 25s; }
+        .shape:nth-child(2) { top: 40%; right: -10%; width: 400px; height: 400px; background: var(--accent-cyan); animation-duration: 30s; animation-direction: reverse; }
+        .shape:nth-child(3) { bottom: -10%; left: 20%; width: 300px; height: 300px; background: var(--accent-pink); animation-duration: 20s; }
+
+        @keyframes floatShape {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(100px, 50px) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* --- 容器 --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            padding: 6rem 1rem 4rem 1rem;
+            position: relative;
+        }
+
+        .school-name {
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-block;
+            border: 1px solid var(--accent-cyan);
+            padding: 5px 15px;
+            border-radius: 50px;
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 4rem;
+            margin: 0;
+            line-height: 1.2;
+            background: linear-gradient(to right, #fff, var(--accent-cyan), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+            animation: textShine 5s infinite linear;
+        }
+
+        @keyframes textShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #ddd;
+            margin-top: 1rem;
+            font-weight: 300;
+        }
+
+        .tagline {
+            display: inline-block;
+            background: var(--accent-pink);
+            color: white;
+            padding: 5px 15px;
+            font-weight: bold;
+            transform: rotate(-2deg);
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+            margin-top: 10px;
+        }
+
+        /* --- 區塊通用樣式 (玻璃擬態) --- */
+        .section {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* 進場動畫初始狀態 */
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 242, 255, 0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        h2 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2.2rem;
+            color: var(--accent-yellow);
+            border-left: 5px solid var(--accent-pink);
+            padding-left: 1rem;
+            margin-top: 0;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #d1d5db;
+            line-height: 1.9;
+        }
+
+        /* --- 課程引言 --- */
+        .intro-box {
+            text-align: center;
+            font-size: 1.3rem;
+            font-style: italic;
+            border: 2px dashed var(--accent-cyan);
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        /* --- 師資卡片 (TCG 風格 - 修正版) --- */
+        .faculty-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 280px;
+            background: linear-gradient(145deg, #2a1b3d, #1a0b2e);
+            border-radius: 15px;
+            padding: 10px;
+            border: 2px solid var(--accent-purple);
+            position: relative;
+            transition: transform 0.3s;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: scale(1.05) rotate(1deg);
+            z-index: 10;
+            box-shadow: 0 0 20px var(--accent-purple);
+        }
+
+        /* --- 圖片容器修正：使用 contain 讓圖片完整顯示 --- */
+        .card-img-container {
+            width: 100%;
+            height: 250px;
+            /* 改用徑向漸層背景，類似聚光燈效果，讓透明 PNG 更好看 */
+            background: radial-gradient(circle at center, #5e4b75 0%, #1a0b2e 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #555;
+            display: flex;
+            align-items: flex-end; /* 讓人物靠底對齊 */
+            justify-content: center;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%; 
+            /* 關鍵修改：使用 contain 而不是 cover，確保完整顯示不被裁切 */
+            object-fit: contain; 
+            object-position: bottom center; /* 靠下置中 */
+            transition: transform 0.5s;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); /* 增加一點立體陰影 */
+        }
+
+        .card:hover .card-img-container img {
+            transform: scale(1.1); /* 滑鼠移上去稍微放大 */
+        }
+
+        .card-info {
+            text-align: center;
+            padding-top: 15px;
+        }
+
+        .card-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 5px 0;
+        }
+
+        .card-title {
+            color: var(--accent-yellow);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- 課程表格 --- */
+        .schedule-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .schedule-table th {
+            text-align: left;
+            color: var(--accent-cyan);
+            padding: 1rem;
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        .schedule-table td {
+            background: rgba(255,255,255,0.05);
+            padding: 1.2rem;
+            transition: background 0.3s;
+        }
+
+        .schedule-table tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; font-weight: bold; color: var(--accent-pink); }
+        .schedule-table tr td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+
+        .schedule-table tr:hover td {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* --- 評分方式 --- */
+        .grade-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .grade-item {
+            flex: 1 1 200px;
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        .grade-item strong {
+            display: block;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* --- 吉祥物與互動 (修正版) --- */
+        .mascot {
+            position: fixed;
+            z-index: 9999;
+            cursor: grab;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            transition: filter 0.3s;
+        }
+
+        .mascot:hover {
+            filter: drop-shadow(0 0 15px var(--accent-cyan)) brightness(1.2);
+            animation: shake 0.5s infinite;
+        }
+
+        .mascot:active {
+            cursor: grabbing;
+        }
+
+        /* 針對個別吉祥物調整大小 */
+        #mascotKen { 
+            width: 130px; /* 左邊 Ken 的寬度 */
+            height: auto;
+            bottom: 20px; 
+            left: 20px; 
+        }
+
+        #mascotLiyu { 
+            width: 160px; /* 右邊 Liyu 設大一點，因為 SVG 視覺上可能偏小 */
+            height: auto;
+            bottom: 20px; 
+            right: 20px; 
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 背景動畫元素 -->
+    <div class="background-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <header>
+        <div class="school-name">新北市立雙溪高級中學</div>
+        <h1>人文社會類<br>桌遊設計與製作</h1>
+        <div class="subtitle">高三多元選修 ｜ 2 學分</div>
+        <div class="tagline">發現你的設計魂 X 社會關懷</div>
+    </header>
+
+    <div class="container">
+        <!-- 引言 -->
+        <section class="section intro-box">
+            <p>
+                「歷經了神選之修，從高一漫遊雙溪、桌遊看社會、雙溪小記者，<br>
+                高二媒體識讀、高三雙溪公民行動...<br>
+                你已經蓄勢待發準備<span style="color:var(--accent-pink); font-weight:900;">『變態』</span>了嗎？」
+            </p>
+            <p style="margin-bottom:0;">歡迎你在高三下，高中生涯的最後一個學期，加入我們的行列！</p>
+        </section>
+
+        <!-- 課程核心 -->
+        <section class="section">
+            <h2>這門課，我們不只玩，更要創造對話</h2>
+            <p>
+                高三的你，是否渴望將課本中的歷史脈絡、地理疆界與公民議題，轉化為觸手可及的真實體驗？
+            </p>
+            <p>
+                這門課將引導你跳脫紙筆，以<b>「社會設計師」</b>的視角，將複雜的人文社會議題，濃縮為一盒充滿挑戰與反思的桌上遊戲。我們不追求單純的娛樂，而是尋求透過遊戲機制，引發玩家的同理心，並建構一個可以深度對話的場域。
+            </p>
+        </section>
+
+        <!-- 師資陣容 (卡牌風格) -->
+        <section class="section" style="border-color: var(--accent-yellow);">
+            <h2 style="text-align: center; border: none; color: var(--accent-yellow);">黃金師資陣容</h2>
+            <div class="faculty-grid">
+                <!-- 老師 1 -->
+                <div class="card">
+                    <div class="card-img-container">
+                        <!-- 確保圖片路徑正確 -->
+                        <img src="image/Ken.png" alt="陳志驅老師">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">陳志驅 老師</div>
+                        <div class="card-title">歷史爆帥名師</div>
+                    </div>
+                </div>
+
+                <!-- 老師 2 -->
+                <div class="card">
+                    <div class="card-img-container">
+                        <!-- 確保圖片路徑正確 -->
+                        <img src="image/LiyuChillGuy.svg" alt="邱俐瑜老師">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">邱俐瑜 老師</div>
+                        <div class="card-title">公民神兼資訊神</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 機制介紹 -->
+        <section class="section">
+            <h2>從經典機制，洞察社會的縮影</h2>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent-cyan); padding-left: 15px;">
+                    <strong style="color:var(--accent-cyan)">歷史模擬與推演：</strong><br>理解歷史充滿了結構限制、利益權衡與偶然的變數。
+                </li>
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent-pink); padding-left: 15px;">
+                    <strong style="color:var(--accent-pink)">資源分配與談判：</strong><br>反思社會資源分配的公平性，並在談判中兼顧個人利益與群體共識。
+                </li>
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent-yellow); padding-left: 15px;">
+                    <strong style="color:var(--accent-yellow)">合作與衝突機制：</strong><br>探索信任的建立與瓦解、團體動力的形成。
+                </li>
+                <li style="border-left: 3px solid var(--accent-purple); padding-left: 15px;">
+                    <strong style="color:var(--accent-purple)">資訊不對稱與邏輯推理：</strong><br>體驗資訊落差如何影響決策，還原事件的真相。
+                </li>
+            </ul>
+        </section>
+
+        <!-- 課程進度 -->
+        <section class="section">
+            <h2>一學期 18 週的深度探索</h2>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th width="20%">週次</th>
+                        <th width="30%">階段</th>
+                        <th>內容規劃</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>W1-W4</td>
+                        <td>解構與洞察</td>
+                        <td>課程導論：從「玩家」到「設計師」。分析經典遊戲機制如何與主題結合。</td>
+                    </tr>
+                    <tr>
+                        <td>W5-W10</td>
+                        <td>議題與轉化</td>
+                        <td>確立研究議題（環境、族群、正義等），將核心概念轉化為遊戲機制。</td>
+                    </tr>
+                    <tr>
+                        <td>W11-W16</td>
+                        <td>創造與迭代</td>
+                        <td>原型(Prototype)製作與測試。撰寫規則書，反覆修正平衡。</td>
+                    </tr>
+                    <tr>
+                        <td>W17-W18</td>
+                        <td>發表與對話</td>
+                        <td>成果發表會！闡述設計理念，邀請師生共同體驗與反饋。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 評量方式 -->
+        <section class="section">
+            <h2>社會設計力評量</h2>
+            <p style="text-align: center; color: var(--accent-pink); font-weight: bold; margin-bottom: 2rem;">
+                NO! 不用考試背課本，我們看重過程與深度！
+            </p>
+            <div class="grade-box">
+                <div class="grade-item">
+                    <strong>議題研究報告</strong>
+                    展現你對所選議題的理解與洞見。
+                </div>
+                <div class="grade-item" style="border-color: var(--accent-pink);">
+                    <strong>設計歷程紀錄</strong>
+                    呈現從發想到成品，測試與修正的軌跡。
+                </div>
+                <div class="grade-item" style="border-color: var(--accent-yellow);">
+                    <strong>原型實作與成品</strong>
+                    最終的桌遊作品，含配件與規則書。
+                </div>
+                <div class="grade-item" style="border-color: var(--accent-purple);">
+                    <strong>成果發表</strong>
+                    公開介紹作品的設計理念與核心價值。
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Copyright © Liyuchiutiger Gongminshen</p>
+    </footer>
+
+    <!-- 吉祥物 -->
+    <img src="image/Ken.png" alt="Ken" class="mascot" id="mascotKen">
+    <img src="image/LiyuChillGuy.svg" alt="Liyu" class="mascot" id="mascotLiyu">
+
+    <script>
+        // --- 滾動進場動畫 ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- 吉祥物拖曳功能 ---
+        function enableDrag(element) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            element.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = element.getBoundingClientRect().left;
+                initialTop = element.getBoundingClientRect().top;
+                
+                element.style.cursor = 'grabbing';
+                // 移除 bottom/right 定位，改用 left/top 以便拖曳
+                element.style.bottom = 'auto';
+                element.style.right = 'auto';
+                element.style.left = initialLeft + 'px';
+                element.style.top = initialTop + 'px';
+                
+                e.preventDefault(); // 防止圖片被瀏覽器選取拖曳
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                element.style.left = (initialLeft + dx) + 'px';
+                element.style.top = (initialTop + dy) + 'px';
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                element.style.cursor = 'grab';
+            });
+        }
+
+        // 確保 DOM 載入後再綁定
+        window.onload = function() {
+            enableDrag(document.getElementById('mascotKen'));
+            enableDrag(document.getElementById('mascotLiyu'));
+        };
+    </script>
+</body>
+</html>
