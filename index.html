@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>人文社會類桌遊設計與製作 - 雙溪高中</title>
+    <title>人文社會類桌遊設計與製作｜新北市立雙溪高中</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@300;500;700&display=swap');
 
@@ -14,8 +14,6 @@
             --accent-pink: #ff0055;
             --accent-yellow: #ffcc00;
             --accent-purple: #bd00ff;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --card-border: rgba(255, 255, 255, 0.2);
         }
 
         /* --- 全局樣式 --- */
@@ -26,39 +24,69 @@
             background-color: var(--bg-deep);
             color: #ffffff;
             overflow-x: hidden;
-            /* 網格背景紋理 */
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            min-height: 100vh;
         }
 
-        /* --- 背景飄浮動畫物件 --- */
-        .background-shapes {
+        /* --- 背景動畫系統 (三層結構) --- */
+        
+        /* 1. 底層：流動極光 */
+        .bg-layer-1 {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(-45deg, #1a0b2e, #2a1b3d, #150021, #0d001a);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+            z-index: -3;
+        }
+
+        /* 2. 中層：移動網格 */
+        .bg-layer-2 {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 500px;
+            animation: gridMove 20s linear infinite;
+            z-index: -2;
+            opacity: 0.6;
+        }
+
+        /* 3. 上層：飄浮光球 */
+        .bg-layer-3 {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             overflow: hidden;
         }
 
-        .shape {
+        .orb {
             position: absolute;
-            filter: blur(50px);
+            border-radius: 50%;
+            filter: blur(60px);
             opacity: 0.6;
-            animation: floatShape 20s infinite linear;
+            animation: floatOrb 10s infinite alternate ease-in-out;
+        }
+        .orb:nth-child(1) { width: 400px; height: 400px; background: var(--accent-purple); top: -10%; left: -10%; animation-duration: 12s; }
+        .orb:nth-child(2) { width: 300px; height: 300px; background: var(--accent-cyan); top: 40%; right: -5%; animation-duration: 15s; animation-delay: -5s; }
+        .orb:nth-child(3) { width: 350px; height: 350px; background: var(--accent-pink); bottom: -10%; left: 30%; animation-duration: 18s; animation-delay: -2s; }
+
+        /* --- 動畫 Keyframes --- */
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .shape:nth-child(1) { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--accent-purple); animation-duration: 25s; }
-        .shape:nth-child(2) { top: 40%; right: -10%; width: 400px; height: 400px; background: var(--accent-cyan); animation-duration: 30s; animation-direction: reverse; }
-        .shape:nth-child(3) { bottom: -10%; left: 20%; width: 300px; height: 300px; background: var(--accent-pink); animation-duration: 20s; }
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
 
-        @keyframes floatShape {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(100px, 50px) rotate(180deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 20px) scale(1.1); }
         }
 
         /* --- 容器 --- */
@@ -82,64 +110,78 @@
             letter-spacing: 5px;
             color: var(--accent-cyan);
             text-transform: uppercase;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             display: inline-block;
             border: 1px solid var(--accent-cyan);
             padding: 5px 15px;
             border-radius: 50px;
             background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
 
-        h1 {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 4rem;
-            margin: 0;
-            line-height: 1.2;
-            background: linear-gradient(to right, #fff, var(--accent-cyan), #fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
-            animation: textShine 5s infinite linear;
+        /* --- LOGO 樣式 (強力霓虹效果) --- */
+        .course-logo {
+            display: block;
+            margin: 0 auto 1rem auto;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            /* 反白 + 青色光暈 */
+            filter: invert(1) drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px var(--accent-cyan));
+            /* 霓虹燈閃爍動畫 */
+            animation: neonFlicker 3s infinite alternate;
         }
 
-        @keyframes textShine {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+        @keyframes neonFlicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                filter: invert(1) drop-shadow(0 0 5px #fff) drop-shadow(0 0 15px var(--accent-cyan)) drop-shadow(0 0 30px var(--accent-cyan));
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                filter: invert(1) drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px var(--accent-cyan));
+                opacity: 0.8; /* 模擬接觸不良的閃爍 */
+            }
         }
+
+        /* 隱藏原本文字標題 */
+        h1 { display: none; }
 
         .subtitle {
             font-size: 1.5rem;
             color: #ddd;
             margin-top: 1rem;
             font-weight: 300;
+            letter-spacing: 2px;
         }
 
         .tagline {
             display: inline-block;
-            background: var(--accent-pink);
+            background: linear-gradient(90deg, var(--accent-pink), #ff5e62);
             color: white;
-            padding: 5px 15px;
+            padding: 8px 20px;
             font-weight: bold;
             transform: rotate(-2deg);
             box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 1.1rem;
         }
 
-        /* --- 區塊通用樣式 (玻璃擬態) --- */
+        /* --- 區塊樣式 (更強的玻璃質感與互動) --- */
         .section {
-            background: rgba(20, 20, 30, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03); /* 極淡的背景 */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* 上緣亮光 */
             border-radius: 24px;
             padding: 3rem;
             margin-bottom: 3rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             
             /* 進場動畫初始狀態 */
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(40px);
         }
 
         .section.visible {
@@ -147,10 +189,12 @@
             transform: translateY(0);
         }
 
+        /* 懸停時的浮動與發光 */
         .section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 242, 255, 0.1);
-            border-color: var(--accent-cyan);
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 50px rgba(0, 242, 255, 0.1);
+            border-color: rgba(0, 242, 255, 0.4);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         h2 {
@@ -160,6 +204,7 @@
             border-left: 5px solid var(--accent-pink);
             padding-left: 1rem;
             margin-top: 0;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
         }
 
         p {
@@ -168,7 +213,7 @@
             line-height: 1.9;
         }
 
-        /* --- 課程引言 --- */
+        /* --- 引言區塊 --- */
         .intro-box {
             text-align: center;
             font-size: 1.3rem;
@@ -177,7 +222,7 @@
             background: rgba(0, 242, 255, 0.05);
         }
 
-        /* --- 師資卡片 (TCG 風格 - 修正版) --- */
+        /* --- 師資卡片 (保持原本大小與排版) --- */
         .faculty-grid {
             display: flex;
             justify-content: center;
@@ -192,43 +237,42 @@
             padding: 10px;
             border: 2px solid var(--accent-purple);
             position: relative;
-            transition: transform 0.3s;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
             overflow: hidden;
         }
 
         .card:hover {
-            transform: scale(1.05) rotate(1deg);
+            transform: translateY(-15px) rotate(2deg);
             z-index: 10;
-            box-shadow: 0 0 20px var(--accent-purple);
+            box-shadow: 0 0 30px var(--accent-purple);
         }
 
-        /* --- 圖片容器修正：使用 contain 讓圖片完整顯示 --- */
+        /* 圖片容器：徑向漸層背景 */
         .card-img-container {
             width: 100%;
             height: 250px;
-            /* 改用徑向漸層背景，類似聚光燈效果，讓透明 PNG 更好看 */
             background: radial-gradient(circle at center, #5e4b75 0%, #1a0b2e 100%);
             border-radius: 8px;
             overflow: hidden;
             position: relative;
             border: 1px solid #555;
             display: flex;
-            align-items: flex-end; /* 讓人物靠底對齊 */
+            align-items: flex-end;
             justify-content: center;
         }
 
+        /* 圖片設定：Contain 確保完整顯示 */
         .card-img-container img {
             width: 100%;
             height: 100%; 
-            /* 關鍵修改：使用 contain 而不是 cover，確保完整顯示不被裁切 */
             object-fit: contain; 
-            object-position: bottom center; /* 靠下置中 */
+            object-position: bottom center;
             transition: transform 0.5s;
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); /* 增加一點立體陰影 */
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
         }
 
         .card:hover .card-img-container img {
-            transform: scale(1.1); /* 滑鼠移上去稍微放大 */
+            transform: scale(1.15);
         }
 
         .card-info {
@@ -241,6 +285,7 @@
             font-weight: 900;
             color: #fff;
             margin: 5px 0;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .card-title {
@@ -262,12 +307,14 @@
             color: var(--accent-cyan);
             padding: 1rem;
             border-bottom: 2px solid var(--accent-cyan);
+            font-size: 1.1rem;
         }
 
         .schedule-table td {
             background: rgba(255,255,255,0.05);
             padding: 1.2rem;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            border: 1px solid transparent;
         }
 
         .schedule-table tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; font-weight: bold; color: var(--accent-pink); }
@@ -275,28 +322,36 @@
 
         .schedule-table tr:hover td {
             background: rgba(255,255,255,0.1);
+            transform: scale(1.02);
+            border-color: rgba(255,255,255,0.2);
         }
 
         /* --- 評分方式 --- */
         .grade-box {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .grade-item {
             flex: 1 1 200px;
             background: rgba(255,255,255,0.05);
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1.5rem;
+            border-radius: 12px;
             border-left: 4px solid var(--accent-cyan);
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .grade-item:hover {
+            transform: translateX(10px);
+            background: rgba(0, 242, 255, 0.1);
         }
 
         .grade-item strong {
             display: block;
             color: var(--accent-cyan);
             margin-bottom: 0.5rem;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
         }
 
         /* --- Footer --- */
@@ -306,19 +361,20 @@
             color: #888;
             font-size: 0.9rem;
             background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
         }
 
-        /* --- 吉祥物與互動 (修正版) --- */
+        /* --- 吉祥物 --- */
         .mascot {
             position: fixed;
             z-index: 9999;
             cursor: grab;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
             transition: filter 0.3s;
         }
 
         .mascot:hover {
-            filter: drop-shadow(0 0 15px var(--accent-cyan)) brightness(1.2);
+            filter: drop-shadow(0 0 20px var(--accent-cyan)) brightness(1.2);
             animation: shake 0.5s infinite;
         }
 
@@ -326,16 +382,16 @@
             cursor: grabbing;
         }
 
-        /* 針對個別吉祥物調整大小 */
+        /* 吉祥物大小設定 */
         #mascotKen { 
-            width: 130px; /* 左邊 Ken 的寬度 */
+            width: 130px; 
             height: auto;
             bottom: 20px; 
             left: 20px; 
         }
 
         #mascotLiyu { 
-            width: 160px; /* 右邊 Liyu 設大一點，因為 SVG 視覺上可能偏小 */
+            width: 160px;
             height: auto;
             bottom: 20px; 
             right: 20px; 
@@ -353,16 +409,21 @@
 </head>
 <body>
 
-    <!-- 背景動畫元素 -->
-    <div class="background-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
+    <!-- 背景動畫系統 -->
+    <div class="bg-layer-1"></div> <!-- 極光 -->
+    <div class="bg-layer-2"></div> <!-- 網格 -->
+    <div class="bg-layer-3">       <!-- 光斑 -->
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
     </div>
 
     <header>
         <div class="school-name">新北市立雙溪高級中學</div>
-        <h1>人文社會類<br>桌遊設計與製作</h1>
+        
+        <!-- LOGO (霓虹閃爍) -->
+        <img src="image/人文社會類桌遊設計與製作.svg" alt="人文社會類桌遊設計與製作 Logo" class="course-logo">
+        
         <div class="subtitle">高三多元選修 ｜ 2 學分</div>
         <div class="tagline">發現你的設計魂 X 社會關懷</div>
     </header>
@@ -373,7 +434,7 @@
             <p>
                 「歷經了神選之修，從高一漫遊雙溪、桌遊看社會、雙溪小記者，<br>
                 高二媒體識讀、高三雙溪公民行動...<br>
-                你已經蓄勢待發準備<span style="color:var(--accent-pink); font-weight:900;">『變態』</span>了嗎？」
+                你已經蓄勢待發準備<span style="color:var(--accent-pink); font-weight:900; text-shadow: 0 0 10px var(--accent-pink);">『變態』</span>了嗎？」
             </p>
             <p style="margin-bottom:0;">歡迎你在高三下，高中生涯的最後一個學期，加入我們的行列！</p>
         </section>
@@ -389,14 +450,13 @@
             </p>
         </section>
 
-        <!-- 師資陣容 (卡牌風格) -->
-        <section class="section" style="border-color: var(--accent-yellow);">
+        <!-- 師資陣容 -->
+        <section class="section" style="border-color: var(--accent-yellow); box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);">
             <h2 style="text-align: center; border: none; color: var(--accent-yellow);">黃金師資陣容</h2>
             <div class="faculty-grid">
                 <!-- 老師 1 -->
                 <div class="card">
                     <div class="card-img-container">
-                        <!-- 確保圖片路徑正確 -->
                         <img src="image/Ken.png" alt="陳志驅老師">
                     </div>
                     <div class="card-info">
@@ -408,7 +468,6 @@
                 <!-- 老師 2 -->
                 <div class="card">
                     <div class="card-img-container">
-                        <!-- 確保圖片路徑正確 -->
                         <img src="image/LiyuChillGuy.svg" alt="邱俐瑜老師">
                     </div>
                     <div class="card-info">
@@ -423,16 +482,16 @@
         <section class="section">
             <h2>從經典機制，洞察社會的縮影</h2>
             <ul style="list-style: none; padding: 0;">
-                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent-cyan); padding-left: 15px;">
+                <li style="margin-bottom: 20px; border-left: 3px solid var(--accent-cyan); padding-left: 20px;">
                     <strong style="color:var(--accent-cyan)">歷史模擬與推演：</strong><br>理解歷史充滿了結構限制、利益權衡與偶然的變數。
                 </li>
-                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent-pink); padding-left: 15px;">
+                <li style="margin-bottom: 20px; border-left: 3px solid var(--accent-pink); padding-left: 20px;">
                     <strong style="color:var(--accent-pink)">資源分配與談判：</strong><br>反思社會資源分配的公平性，並在談判中兼顧個人利益與群體共識。
                 </li>
-                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent-yellow); padding-left: 15px;">
+                <li style="margin-bottom: 20px; border-left: 3px solid var(--accent-yellow); padding-left: 20px;">
                     <strong style="color:var(--accent-yellow)">合作與衝突機制：</strong><br>探索信任的建立與瓦解、團體動力的形成。
                 </li>
-                <li style="border-left: 3px solid var(--accent-purple); padding-left: 15px;">
+                <li style="border-left: 3px solid var(--accent-purple); padding-left: 20px;">
                     <strong style="color:var(--accent-purple)">資訊不對稱與邏輯推理：</strong><br>體驗資訊落差如何影響決策，還原事件的真相。
                 </li>
             </ul>
@@ -477,7 +536,7 @@
         <!-- 評量方式 -->
         <section class="section">
             <h2>社會設計力評量</h2>
-            <p style="text-align: center; color: var(--accent-pink); font-weight: bold; margin-bottom: 2rem;">
+            <p style="text-align: center; color: var(--accent-pink); font-weight: bold; margin-bottom: 2rem; text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);">
                 NO! 不用考試背課本，我們看重過程與深度！
             </p>
             <div class="grade-box">
@@ -486,15 +545,15 @@
                     展現你對所選議題的理解與洞見。
                 </div>
                 <div class="grade-item" style="border-color: var(--accent-pink);">
-                    <strong>設計歷程紀錄</strong>
+                    <strong style="color:var(--accent-pink)">設計歷程紀錄</strong>
                     呈現從發想到成品，測試與修正的軌跡。
                 </div>
                 <div class="grade-item" style="border-color: var(--accent-yellow);">
-                    <strong>原型實作與成品</strong>
+                    <strong style="color:var(--accent-yellow)">原型實作與成品</strong>
                     最終的桌遊作品，含配件與規則書。
                 </div>
                 <div class="grade-item" style="border-color: var(--accent-purple);">
-                    <strong>成果發表</strong>
+                    <strong style="color:var(--accent-purple)">成果發表</strong>
                     公開介紹作品的設計理念與核心價值。
                 </div>
             </div>
@@ -536,13 +595,12 @@
                 initialTop = element.getBoundingClientRect().top;
                 
                 element.style.cursor = 'grabbing';
-                // 移除 bottom/right 定位，改用 left/top 以便拖曳
                 element.style.bottom = 'auto';
                 element.style.right = 'auto';
                 element.style.left = initialLeft + 'px';
                 element.style.top = initialTop + 'px';
                 
-                e.preventDefault(); // 防止圖片被瀏覽器選取拖曳
+                e.preventDefault(); 
             });
 
             document.addEventListener('mousemove', (e) => {
@@ -559,7 +617,6 @@
             });
         }
 
-        // 確保 DOM 載入後再綁定
         window.onload = function() {
             enableDrag(document.getElementById('mascotKen'));
             enableDrag(document.getElementById('mascotLiyu'));
